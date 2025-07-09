@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.11' // Ou autre version Python
+            label 'docker'      // Facultatif : s'il faut une machine avec Docker
+        }
+    }
 
     stages {
         stage('Hello') {
@@ -7,11 +12,26 @@ pipeline {
                 echo 'Hello World'
             }
         }
+
         stage('Validation manuelle') {
             steps {
                 input message: 'Souhaitez-vous continuer vers l’étape suivante ?'
             }
         }
+
+        stage('Script Python') {
+            steps {
+                script {
+                    writeFile file: 'script.py', text: '''
+print("Bonjour depuis Python !")
+for i in range(3):
+    print("Itération", i + 1)
+'''
+                    sh 'python script.py'
+                }
+            }
+        }
+
         stage('Bye') {
             steps {
                 echo 'Bye World'
