@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Validation manuelle') {
+            steps {
+                input message: 'Souhaitez-vous continuer vers l’étape suivante ?'
+            }
+        }
+        stage('Bye') {
+            steps {
+                echo 'Bye World'
+            }
+        }
+    }
+}
