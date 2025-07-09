@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.11' // Ou autre version Python
-            label 'docker'      // Facultatif : s'il faut une machine avec Docker
-        }
-    }
+    agent any
 
     stages {
         stage('Hello') {
@@ -22,12 +17,14 @@ pipeline {
         stage('Script Python') {
             steps {
                 script {
-                    writeFile file: 'script.py', text: '''
+                    docker.image('python:3.11').inside {
+                        writeFile file: 'script.py', text: '''
 print("Bonjour depuis Python !")
 for i in range(3):
     print("Itération", i + 1)
 '''
-                    sh 'python script.py'
+                        sh 'python script.py'
+                    }
                 }
             }
         }
