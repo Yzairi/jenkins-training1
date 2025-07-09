@@ -1,38 +1,25 @@
 pipeline {
     agent any
-
     stages {
-        stage('Hello') {
+        stage('Clone') {
             steps {
-                echo 'Hello World'
+                git url: 'https://github.com/Yzairi/jenkins-training1.git'
             }
         }
-
-        stage('Validation manuelle') {
+        stage('Build') {
             steps {
-                input message: 'Souhaitez-vous continuer vers l’étape suivante ?'
-            }
-        }
-
-        stage('Script Python') {
-            steps {
-                script {
-                    docker.image('python:3.11').inside {
-                        writeFile file: 'script.py', text: '''
-print("Bonjour depuis Python !")
-for i in range(3):
-    print("Itération", i + 1)
-'''
-                        sh 'python script.py'
-                    }
+                withMaven(
+                    maven: 'MAVEN_3_9_9',
+                    jdk: 'JDK-21'
+                ) {
+                    sh 'mvn package'
                 }
             }
-        }
-
-        stage('Bye') {
+        stage('Launch') {
             steps {
-                echo 'Bye World'
+                sh 'java -Dquarkus.http.port=8081 -jar target/quarkus-app/quarkus-run.jar'
             }
         }
     }
 }
+ 
